@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Blog\Admin;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Repositories\BlogPostRepository;
+use App\Repositories\BlogCategoryRepository;
 
 /**
  * Управление статьями блога
@@ -19,11 +19,17 @@ class PostController extends BaseBlogAdminController
      */
     private $blogPostRepository;
 
+    /**
+     * @var BlogCategoryRepository
+     */
+    private $blogCategoryRepository;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->blogPostRepository = app(BlogPostRepository::class);
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
     }
 
 
@@ -79,7 +85,14 @@ class PostController extends BaseBlogAdminController
      */
     public function edit($id)
     {
-        //
+        $item = $this->blogPostRepository->getEdit($id);
+        if (empty($item)) {
+            abort(404);
+        }
+
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+
+        return view('blog.admin.posts.edit', compact('item', 'categoryList'));
     }
 
     /**
